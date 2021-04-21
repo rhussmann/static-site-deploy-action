@@ -1,0 +1,28 @@
+on: ["push"]
+
+jobs:
+  hello_world_job:
+    runs-on: ubuntu-latest
+    name: Deploy static site
+    steps:
+      # To use this repository's private action,
+      # you must check out the repository
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Deploy static site
+        uses: ./ # Uses an action in the root directory
+        id: deploy
+        with:
+          wireguard-private-key: ${{ secrets.CTX_WIREGUARD_PRIVATE_KEY }}
+          wireguard-server-public-key: ${{ secrets.CTX_WIREGUARD_SERVER_PUBLIC_KEY }}
+          wireguard-server-endpoint: ${{ secrets.CTX_WIREGUARD_SERVER_ENDPOINT }}
+          ssh-key: ${{ secrets.CTX_SERVER_DEPLOY_SECRET }}
+          domain-name: test.rhussmann.com
+          short-name: test_rhussmann_com
+          kong-host: 192.168.11.103
+          kong-port: 8001
+          ssh-host: 192.168.11.103
+          ssh-user: rhussmann
+          deploy-assets: ./dist/*
+          kong-nginx-service-name: local_nginx

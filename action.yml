@@ -1,0 +1,60 @@
+# action.yml
+name: 'Hello World'
+description: 'Greet someone and record the time'
+inputs:
+  wireguard-private-key:
+    description: 'The private key for the wireguard interface to create'
+    required: true
+  wireguard-server-public-key:
+    description: 'The public key of the wireguard server to connect to'
+    required: true
+  wireguard-server-endpoint:
+    description: 'Endpoint of the wireguard server to connect to'
+    required: true
+  ssh-key:
+    description: 'Private SSH key for connecting to the remote instance'
+    required: true
+  domain-name:
+    description: 'Domain name used to host the static assets'
+    required: true
+  short-name:
+    description: 'Short name to identify this site'
+    required: true
+  kong-host:
+    description: 'IP or DNS name for the Kong host'
+    required: true
+  kong-port:
+    description: 'Port Kong is running on'
+    required: true
+  ssh-user:
+    description: 'The SSH username to login to the remote instance'
+    required: true
+  ssh-host:
+    description: 'IP or DNS name for the Docker host'
+    required: true
+  deploy-assets:
+    description: 'Static assets to deploy'
+    require: true
+  kong-nginx-service-name:
+    description: 'Kong service name of the NGINX instance hosting static content'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+  - name: Run deploy script
+    run: ./deploy.sh
+    shell: bash
+    env:
+      CTX_WIREGUARD_PRIVATE_KEY: ${{ inputs.wireguard-private-key }}
+      CTX_WIREGUARD_SERVER_PUBLIC_KEY: ${{ inputs.wireguard-server-public-key }}
+      CTX_WIREGUARD_SERVER_ENDPOINT: ${{ inputs.wireguard-server-endpoint }}
+      CTX_SERVER_DEPLOY_SECRET: ${{ inputs.ssh-key }}
+      DOMAIN_NAME: ${{ inputs.domain-name }}
+      SHORT_NAME: ${{ inputs.short-name }}
+      KONG_HOST: ${{ inputs.kong-host }}
+      KONG_PORT: ${{ inputs.kong-port }}
+      SSH_USER: ${{ inputs.ssh-user }}
+      DEPLOY_ASSETS: ${{ inputs.deploy-assets }}
+      DOCKER_HOST: ${{ inputs.ssh-host }}
+      NGINX_SERVICE_NAME: ${{ inputs.kong-nginx-service-name }}
