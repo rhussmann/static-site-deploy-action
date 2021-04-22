@@ -85,7 +85,7 @@ if [ "$REDIRECT_EXISTS" == "0" ]; then
     echo "Adding http->https redirect"
     curl -fs -X POST $KONG_URL/routes/$ROUTE_ID/plugins \
 	 -F "name=pre-function" \
-	 -F "config.header_filter[1]=@custom.lua"
+	 -F "config.header_filter[1]=@$GITHUB_ACTION_PATH/custom.lua"
 else
     echo "HTTP -> HTTPS redirect already exists for $DOMAIN_NAME"
 fi
