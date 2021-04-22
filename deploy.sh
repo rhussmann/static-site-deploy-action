@@ -5,17 +5,17 @@ set -e
 KONG_URL=$KONG_HOST:$KONG_PORT
 
 cleanup() {
-    rm -rf $GITHUB_WORKSPACE/tmp/.ssh
+    rm -rf $GITHUB_ACTION_PATH/tmp/.ssh
     wg-quick down wg0
 }
 
 trap cleanup EXIT
 
-cp $GITHUB_WORKSPACE/site.conf.template /tmp/$SHORT_NAME.conf
+cp $GITHUB_ACTION_PATH/site.conf.template /tmp/$SHORT_NAME.conf
 sed -i -e "s@{{DOMAIN_NAME}}@$DOMAIN_NAME@" /tmp/$SHORT_NAME.conf
 sed -i -e "s@{{SHORT_NAME}}@$SHORT_NAME@" /tmp/$SHORT_NAME.conf
 
-cp $GITHUB_WORKSPACE/tunnel.conf /tmp/
+cp $GITHUB_ACTION_PATH/tunnel.conf /tmp/
 
 sed -i -e "s@{{CTX_WIREGUARD_PRIVATE_KEY}}@$CTX_WIREGUARD_PRIVATE_KEY@" /tmp/tunnel.conf
 sed -i -e "s@{{CTX_WIREGUARD_SERVER_PUBLIC_KEY}}@$CTX_WIREGUARD_SERVER_PUBLIC_KEY@" /tmp/tunnel.conf
@@ -26,16 +26,16 @@ sudo cp /tmp/tunnel.conf /etc/wireguard/wg0.conf
 
 wg-quick up wg0
 
-mkdir -p $GITHUB_WORKSPACE/tmp/.ssh
-echo "$CTX_SERVER_DEPLOY_SECRET" >> $GITHUB_WORKSPACE/tmp/.ssh/id_rsa
-chmod 600 $GITHUB_WORKSPACE/tmp/.ssh/id_rsa
+mkdir -p $GITHUB_ACTION_PATH/tmp/.ssh
+echo "$CTX_SERVER_DEPLOY_SECRET" >> $GITHUB_ACTION_PATH/tmp/.ssh/id_rsa
+chmod 600 $GITHUB_ACTION_PATH/tmp/.ssh/id_rsa
 
-scp -i $GITHUB_WORKSPACE/tmp/.ssh/id_rsa -o StrictHostKeyChecking=no /tmp/$SHORT_NAME.conf $SSH_USER@$DOCKER_HOST:~/nginx-data/configs/
+scp -i $GITHUB_ACTION_PATH/tmp/.ssh/id_rsa -o StrictHostKeyChecking=no /tmp/$SHORT_NAME.conf $SSH_USER@$DOCKER_HOST:~/nginx-data/configs/
 
-ssh -i $GITHUB_WORKSPACE/tmp/.ssh/id_rsa -o StrictHostKeyChecking=no $SSH_USER@$DOCKER_HOST mkdir -p ./nginx-data/sites/$SHORT_NAME
-scp -i $GITHUB_WORKSPACE/tmp/.ssh/id_rsa -o StrictHostKeyChecking=no -r $DEPLOY_ASSETS $SSH_USER@$DOCKER_HOST:./nginx-data/sites/$SHORT_NAME/
+ssh -i $GITHUB_ACTION_PATH/tmp/.ssh/id_rsa -o StrictHostKeyChecking=no $SSH_USER@$DOCKER_HOST mkdir -p ./nginx-data/sites/$SHORT_NAME
+scp -i $GITHUB_ACTION_PATH/tmp/.ssh/id_rsa -o StrictHostKeyChecking=no -r $DEPLOY_ASSETS $SSH_USER@$DOCKER_HOST:./nginx-data/sites/$SHORT_NAME/
 
-ssh -i $GITHUB_WORKSPACE/tmp/.ssh/id_rsa -o StrictHostKeyChecking=no $SSH_USER@$DOCKER_HOST 'cd ~/Code/kong && /usr/local/bin/docker compose kill -s HUP nginx'
+ssh -i $GITHUB_ACTION_PATH/tmp/.ssh/id_rsa -o StrictHostKeyChecking=no $SSH_USER@$DOCKER_HOST 'cd ~/Code/kong && /usr/local/bin/docker compose kill -s HUP nginx'
 
 ROUTE_EXISTS=$(curl -fs $KONG_URL/services/$NGINX_SERVICE_NAME/routes | jq ".data | map(select(.hosts[0] == \"$DOMAIN_NAME\")) | length")
 
