@@ -43,7 +43,7 @@ runs:
   using: 'composite'
   steps:
   - name: Run deploy script
-    run: ${{ .github.action_path }}/deploy.sh
+    run: $GITHUB_ACTION_PATH/deploy.sh
     shell: bash
     env:
       CTX_WIREGUARD_PRIVATE_KEY: ${{ inputs.wireguard-private-key }}
