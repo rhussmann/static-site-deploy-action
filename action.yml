@@ -42,11 +42,8 @@ inputs:
 runs:
   using: 'composite'
   steps:
-  - name: Checkout
-    uses: actions/checkout@v2
-
   - name: Run deploy script
-    run: ./deploy.sh
+    run: ${{ .github.action_path }}/deploy.sh
     shell: bash
     env:
       CTX_WIREGUARD_PRIVATE_KEY: ${{ inputs.wireguard-private-key }}
