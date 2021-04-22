@@ -42,6 +42,9 @@ inputs:
 runs:
   using: 'composite'
   steps:
+  - name: Checkout
+    uses: actions/checkout@v2
+
   - name: Run deploy script
     run: ./deploy.sh
     shell: bash
