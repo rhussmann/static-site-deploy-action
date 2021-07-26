@@ -1,6 +1,5 @@
 local scheme = kong.request.get_scheme()
-local string_starts = string.starts
-if scheme == "http" and not string_starts(kong.request.get_path(), "/.well-known/acme-challenge/") then
+if scheme == "http" and not kong.request.get_path():sub(1, "/.well-known/acme-challenge/") == 1 then
   local host = kong.request.get_host()
   local query = kong.request.get_path_with_query()
   local url = "https://" .. host ..query
