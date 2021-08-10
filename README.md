@@ -7,7 +7,7 @@ Github action for deploying a static site via Kong and an nginx service hosting 
 * a wireguard server allowing access to an internal network
 * Kong API Gateway deployed with the `ACME` and `pre-function` plugins enabled
 * nginx deployed as a registered Kong service (used for deploying static assets)
-* a domain name with an A record pointing to the Kong API Gateway instance
+* a domain name with an `A` record pointing to the Kong API Gateway instance
 
 # Expected network architecture
 
